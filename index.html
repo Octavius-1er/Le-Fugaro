@@ -81,15 +81,15 @@
   </div>
 </header>
 <nav><ul>
-  <li><a href="index.html" class="active">Accueil</a></li>
-  <li><a href="?cat=politique">Politique</a></li>
-  <li><a href="?cat=economie">Économie</a></li>
-  <li><a href="?cat=monde">Monde</a></li>
-  <li><a href="?cat=sciences">Sciences</a></li>
-  <li><a href="?cat=culture">Culture</a></li>
-  <li><a href="?cat=sport">Sport</a></li>
-  <li><a href="?cat=faits-divers">Faits divers</a></li>
-  <li><a href="?cat=opinion">Opinion</a></li>
+  <li><a href="index.html" id="nav-accueil">Accueil</a></li>
+  <li><a href="?cat=politique" id="nav-politique">Politique</a></li>
+  <li><a href="?cat=economie" id="nav-economie">Économie</a></li>
+  <li><a href="?cat=monde" id="nav-monde">Monde</a></li>
+  <li><a href="?cat=sciences" id="nav-sciences">Sciences</a></li>
+  <li><a href="?cat=culture" id="nav-culture">Culture</a></li>
+  <li><a href="?cat=sport" id="nav-sport">Sport</a></li>
+  <li><a href="?cat=faits-divers" id="nav-faits-divers">Faits divers</a></li>
+  <li><a href="?cat=opinion" id="nav-opinion">Opinion</a></li>
 </ul></nav>
 
 <div class="breaking" id="breakingBar" style="display:none">
@@ -125,6 +125,10 @@ document.getElementById("dateDisplay").textContent = _ds.charAt(0).toUpperCase()
 
 // Filtre catégorie
 const cat = new URLSearchParams(location.search).get("cat");
+
+// Mettre en surbrillance l'onglet actif
+const activeNav = cat ? document.getElementById("nav-"+cat) : document.getElementById("nav-accueil");
+if (activeNav) activeNav.classList.add("active");
 
 // Mise en forme date
 function fmtDate(ts) {
@@ -168,12 +172,12 @@ function renderGrid(articles) {
     <div class="articles-grid">${cards}</div>`;
 }
 
-// Chargement
+// Chargement — filtre côté client pour éviter l'index composite Firestore
 let query = db.collection("articles").orderBy("createdAt","desc");
-if (cat) query = query.where("rubrique","==",cat);
 
 query.onSnapshot(snap => {
-  const all = snap.docs.map(d => ({id:d.id,...d.data()}));
+  let all = snap.docs.map(d => ({id:d.id,...d.data()}));
+  if (cat) all = all.filter(a => a.rubrique === cat);
   if (!all.length) {
     document.getElementById("empty-state").style.display="block";
     document.getElementById("hero-wrap").innerHTML="";
