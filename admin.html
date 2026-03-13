@@ -235,6 +235,7 @@ function logout() {
 if (sessionStorage.getItem(SESSION_KEY)==="1") {
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="block";
+  // initAdmin() sera appelé après la définition de la fonction (voir fin du script)
 }
 
 // ── ÉTAT ──
@@ -261,7 +262,7 @@ function fmtDate(ts) {
 function loadList() {
   db.collection("articles").orderBy("createdAt","desc").onSnapshot(snap => {
     const list = document.getElementById("articles-list");
-    if (snap.empty) { list.innerHTML='<p style="font-family:'Libre Baskerville',serif;font-size:12px;color:#aaa;">Aucun article.</p>'; return; }
+    if (snap.empty) { list.innerHTML="<p style='font-size:12px;color:#aaa;'>Aucun article.</p>"; return; }
     list.innerHTML = snap.docs.map(d => {
       const a = d.data();
       return `<div class="article-item${currentId===d.id?' selected':''}" onclick="loadArticle('${d.id}')">
